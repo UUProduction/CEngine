@@ -1185,6 +1185,247 @@ input, select, textarea {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ═══════════════════ VIRTUAL JOYSTICK ═══════════════════ */
+
+#m-joystick-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+}
+
+#m-joystick-overlay.hidden { display: none; }
+
+/* Joystick zones — left half / right half */
+.m-joy-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.m-joy-left-zone  { left: 0; }
+.m-joy-right-zone { right: 0; left: auto; }
+
+.m-joy-hint {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 0.1em;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+/* Joystick base ring */
+.m-joy-base {
+  position: fixed;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.12);
+  pointer-events: none;
+  z-index: 300;
+}
+
+.m-joy-base.hidden { display: none; }
+
+/* Joystick inner stick */
+.m-joy-stick {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 164, 220, 0.55);
+  border: 2px solid rgba(0, 164, 220, 0.9);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 12px rgba(0,164,220,0.4);
+  transition: background 0.1s;
+}
+
+/* Action buttons — bottom right */
+#m-action-btns {
+  position: absolute;
+  bottom: 30px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  pointer-events: auto;
+  z-index: 250;
+}
+
+.m-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.18);
+  background: rgba(20, 20, 20, 0.75);
+  color: rgba(255,255,255,0.7);
+  font-size: 9px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.m-action-btn span {
+  font-size: 8px;
+  color: rgba(255,255,255,0.45);
+}
+
+.m-action-btn:active,
+.m-action-btn.pressed {
+  background: rgba(0,164,220,0.3);
+  border-color: rgba(0,164,220,0.8);
+  color: #fff;
+  transform: scale(0.91);
+  box-shadow: 0 0 14px rgba(0,164,220,0.4);
+}
+
+.m-btn-jump   { background: rgba(39,174,96,0.18);  border-color: rgba(39,174,96,0.4);  }
+.m-btn-action { background: rgba(0,164,220,0.18);   border-color: rgba(0,164,220,0.4);  }
+.m-btn-shoot  { background: rgba(192,57,43,0.18);   border-color: rgba(192,57,43,0.4);  }
+
+.m-btn-jump:active   { background: rgba(39,174,96,0.4);  }
+.m-btn-action:active { background: rgba(0,164,220,0.4);  }
+.m-btn-shoot:active  { background: rgba(192,57,43,0.4);  }
+
+/* HUD bar */
+#m-hud-bar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+  z-index: 250;
+}
+
+#m-hud-health, #m-hud-ammo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 4px 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.m-hud-label {
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.08em;
+}
+
+.m-hud-val {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: #fff;
+  min-width: 24px;
+  text-align: right;
+}
+
+.m-hud-bar-wrap {
+  width: 60px;
+  height: 5px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.m-hud-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.2s, background 0.3s;
+}
+
+.m-hud-hp { background: #27ae60; }
+
+#m-hud-center {
+  flex: 1;
+  text-align: center;
+}
+
+#m-hud-score {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: rgba(255,255,255,0.7);
+  text-shadow: 0 0 8px rgba(0,164,220,0.5);
+  background: rgba(0,0,0,0.4);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Crosshair */
+#m-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 250;
+}
+
+.m-ch-h {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255,255,255,0.5);
+  transform: translateY(-50%);
+}
+
+.m-ch-v {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255,255,255,0.5);
+  transform: translateX(-50%);
+}
+
+.m-ch-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  background: rgba(0,164,220,0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* ═══════════════════ SCROLLBARS ═══════════════════ */
 
 ::-webkit-scrollbar { width: 4px; height: 4px; }
