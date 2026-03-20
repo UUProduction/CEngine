@@ -1255,11 +1255,288 @@ animate();
     window._mSelMesh=e?.mesh||null;
   },100);
 
+/* ══════════════════════════════════════
+   VIRTUAL JOYSTICK — Play mode only
+   Left stick: move camera
+   Right stick: look/orbit
+══════════════════════════════════════ */
+const VirtualJoystick = {
+  leftActive:  false,
+  rightActive: false,
+  leftId:      null,
+  rightId:     null,
+  leftX: 0,  leftY: 0,
+  rightX: 0, rightY: 0,
+  leftBaseX: 0,  leftBaseY: 0,
+  rightBaseX: 0, rightBaseY: 0,
+  SIZE: 60,
+  DEAD: 0.12,
+  moveInterval: null,
+
+  init() {
+    this._buildDOM();
+    this._bindEvents();
+  },
+
+  _buildDOM() {
+    // Inject joystick overlay into scene wrap
+    const wrap = document.getElementById('m-scene-wrap');
+    if (!wrap) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'm-joystick-overlay';
+    overlay.className = 'hidden';
+    overlay.innerHTML = `
+      <!-- Left joystick -->
+      <div id="m-joy-left" class="m-joy-zone m-joy-left-zone">
+        <div id="m-joy-left-base" class="m-joy-base hidden">
+          <div id="m-joy-left-stick" class="m-joy-stick"></div>
+        </div>
+        <span class="m-joy-hint">Move</span>
+      </div>
+
+      <!-- Right joystick -->
+      <div id="m-joy-right" class="m-joy-zone m-joy-right-zone">
+        <div id="m-joy-right-base" class="m-joy-base hidden">
+          <div id="m-joy-right-stick" class="m-joy-stick"></div>
+        </div>
+        <span class="m-joy-hint">Look</span>
+      </div>
+
+      <!-- Action buttons (right side) -->
+      <div id="m-action-btns">
+        <button class="m-action-btn m-btn-jump" id="m-btn-jump">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 14V4M4 7l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <span>Jump</span>
+        </button>
+        <button class="m-action-btn m-btn-action" id="m-btn-action">
+          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M6 8l1.5 1.5L10.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <span>Action</span>
+        </button>
+        <button class="m-action-btn m-btn-shoot" id="m-btn-shoot">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 8h9M14 6l-3 2 3 2M8 5v1M8 10v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+          <span>Fire</span>
+        </button>
+      </div>
+
+      <!-- HUD info bar -->
+      <div id="m-hud-bar">
+        <div id="m-hud-health">
+          <span class="m-hud-label">HP</span>
+          <div class="m-hud-bar-wrap">
+            <div class="m-hud-bar-fill m-hud-hp" id="m-hp-bar" style="width:100%"></div>
+          </div>
+          <span class="m-hud-val" id="m-hp-val">100</span>
+        </div>
+        <div id="m-hud-center">
+          <span id="m-hud-score">Score: 0</span>
+        </div>
+        <div id="m-hud-ammo">
+          <span class="m-hud-label">AMM</span>
+          <span class="m-hud-val" id="m-ammo-val">30</span>
+        </div>
+      </div>
+
+      <!-- Crosshair -->
+      <div id="m-crosshair">
+        <div class="m-ch-h"></div>
+        <div class="m-ch-v"></div>
+        <div class="m-ch-dot"></div>
+      </div>`;
+
+    wrap.appendChild(overlay);
+  },
+
+  _bindEvents() {
+    const overlay = document.getElementById('m-joystick-overlay');
+    if (!overlay) return;
+
+    // Left zone touch
+    const leftZone  = document.getElementById('m-joy-left');
+    const rightZone = document.getElementById('m-joy-right');
+
+    leftZone?.addEventListener('touchstart', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.leftActive) return;
+      const t = e.changedTouches[0];
+      this.leftId    = t.identifier;
+      this.leftActive = true;
+      this.leftBaseX  = t.clientX;
+      this.leftBaseY  = t.clientY;
+      this._showBase('left', t.clientX, t.clientY);
+    }, { passive: false });
+
+    rightZone?.addEventListener('touchstart', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (this.rightActive) return;
+      const t = e.changedTouches[0];
+      this.rightId    = t.identifier;
+      this.rightActive = true;
+      this.rightBaseX  = t.clientX;
+      this.rightBaseY  = t.clientY;
+      this._showBase('right', t.clientX, t.clientY);
+    }, { passive: false });
+
+    document.addEventListener('touchmove', e => {
+      Array.from(e.changedTouches).forEach(t => {
+        if (t.identifier === this.leftId)  this._moveStick('left',  t.clientX, t.clientY);
+        if (t.identifier === this.rightId) this._moveStick('right', t.clientX, t.clientY);
+      });
+    }, { passive: false });
+
+    document.addEventListener('touchend', e => {
+      Array.from(e.changedTouches).forEach(t => {
+        if (t.identifier === this.leftId) {
+          this.leftActive = false; this.leftId = null;
+          this.leftX = 0; this.leftY = 0;
+          this._hideBase('left');
+        }
+        if (t.identifier === this.rightId) {
+          this.rightActive = false; this.rightId = null;
+          this.rightX = 0; this.rightY = 0;
+          this._hideBase('right');
+        }
+      });
+    });
+
+    // Action buttons
+    document.getElementById('m-btn-jump')?.addEventListener('touchstart', e => {
+      e.preventDefault();
+      Audio.tap();
+      this._flashBtn('m-btn-jump');
+      Console.log?.('Jump pressed', 'log', 'Input');
+    }, { passive: false });
+
+    document.getElementById('m-btn-action')?.addEventListener('touchstart', e => {
+      e.preventDefault();
+      Audio.tap();
+      this._flashBtn('m-btn-action');
+      Console.log?.('Action pressed', 'log', 'Input');
+    }, { passive: false });
+
+    document.getElementById('m-btn-shoot')?.addEventListener('touchstart', e => {
+      e.preventDefault();
+      Audio.tap();
+      this._flashBtn('m-btn-shoot');
+      Audio.tone(800, 0.05, 0.04);
+      Console.log?.('Fire pressed', 'log', 'Input');
+    }, { passive: false });
+  },
+
+  _showBase(side, x, y) {
+    const base  = document.getElementById(`m-joy-${side}-base`);
+    const stick = document.getElementById(`m-joy-${side}-stick`);
+    if (!base) return;
+    base.classList.remove('hidden');
+    base.style.left = (x - this.SIZE) + 'px';
+    base.style.top  = (y - this.SIZE) + 'px';
+    if (stick) { stick.style.transform = 'translate(-50%, -50%)'; }
+  },
+
+  _hideBase(side) {
+    const base = document.getElementById(`m-joy-${side}-base`);
+    base?.classList.add('hidden');
+  },
+
+  _moveStick(side, x, y) {
+    const bx = side === 'left' ? this.leftBaseX  : this.rightBaseX;
+    const by = side === 'left' ? this.leftBaseY  : this.rightBaseY;
+    const stick = document.getElementById(`m-joy-${side}-stick`);
+    if (!stick) return;
+
+    let dx = x - bx;
+    let dy = y - by;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const max  = this.SIZE * 0.65;
+
+    if (dist > max) {
+      dx = (dx / dist) * max;
+      dy = (dy / dist) * max;
+    }
+
+    const nx = dx / max; // normalized -1 to 1
+    const ny = dy / max;
+
+    if (side === 'left')  { this.leftX  = nx; this.leftY  = ny; }
+    else                  { this.rightX = nx; this.rightY = ny; }
+
+    stick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  },
+
+  _flashBtn(id) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 150);
+  },
+
+  show() {
+    const overlay = document.getElementById('m-joystick-overlay');
+    overlay?.classList.remove('hidden');
+    // Start camera movement loop
+    this.moveInterval = setInterval(() => this._applyMovement(), 16);
+  },
+
+  hide() {
+    const overlay = document.getElementById('m-joystick-overlay');
+    overlay?.classList.add('hidden');
+    clearInterval(this.moveInterval);
+    this.leftX = this.leftY = this.rightX = this.rightY = 0;
+  },
+
+  _applyMovement() {
+    // Apply left stick → move camera target
+    const MOVE_SPEED  = 0.06;
+    const LOOK_SPEED  = 0.025;
+    const lx = Math.abs(this.leftX)  > this.DEAD ? this.leftX  : 0;
+    const ly = Math.abs(this.leftY)  > this.DEAD ? this.leftY  : 0;
+    const rx = Math.abs(this.rightX) > this.DEAD ? this.rightX : 0;
+    const ry = Math.abs(this.rightY) > this.DEAD ? this.rightY : 0;
+
+    if (lx !== 0 || ly !== 0) {
+      const fwd   = new THREE.Vector3(-Math.sin(SceneView.theta), 0, -Math.cos(SceneView.theta));
+      const right = new THREE.Vector3(Math.cos(SceneView.theta),  0, -Math.sin(SceneView.theta));
+      SceneView.orbitTarget.addScaledVector(right, lx * MOVE_SPEED);
+      SceneView.orbitTarget.addScaledVector(fwd,  -ly * MOVE_SPEED);
+      SceneView._syncCam();
+    }
+
+    if (rx !== 0 || ry !== 0) {
+      SceneView.theta -= rx * LOOK_SPEED;
+      SceneView.phi    = Math.max(0.05, Math.min(Math.PI - 0.05, SceneView.phi + ry * LOOK_SPEED));
+      SceneView._syncCam();
+    }
+  },
+
+  // Update HUD values (call from game logic)
+  setHP(val) {
+    const pct = Math.max(0, Math.min(100, val));
+    const bar = document.getElementById('m-hp-bar');
+    const txt = document.getElementById('m-hp-val');
+    if (bar) bar.style.width = pct + '%';
+    if (txt) txt.textContent = Math.round(pct);
+    if (bar) bar.style.background = pct > 50 ? '#27ae60' : pct > 25 ? '#d4a017' : '#c0392b';
+  },
+
+  setScore(val) {
+    const el = document.getElementById('m-hud-score');
+    if (el) el.textContent = 'Score: ' + val;
+  },
+
+  setAmmo(val) {
+    const el = document.getElementById('m-ammo-val');
+    if (el) el.textContent = val;
+  }
+};
+         
   /* ══════════════════════════════════════
      INIT
   ══════════════════════════════════════ */
   Audio.init();
   SceneView.init();
+  VirtualJoystick.init();
   MobileInspector.clear();
 
   setTimeout(()=>mLog('CEngine Mobile v0.3 ready','log','Engine.js'),100);
