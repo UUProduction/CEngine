@@ -2073,183 +2073,24 @@ animate();
   };
 
   /* ══════════════════════════════════════
-     PLAY MODE — full runtime integration
-  ══════════════════════════════════════ */
-  async function startPlayMode() {
-    const { Physics, Input, ScriptRuntime, GameLoop, makeSceneAPI } = window.CEngineRuntime;
-
-    document.getElementById('btn-play').disabled  = true;
-    document.getElementById('btn-pause').disabled = false;
-    document.getElementById('btn-stop').disabled  = false;
-    document.getElementById('btn-play').classList.add('playing');
-    toast('Starting engine...', 'log', 1000);
-
-    // Init physics
-    const physicsOK = await Physics.init();
-    if (physicsOK) {
-      Console.log('Rapier physics ready', 'log', 'Physics.js');
-    } else {
-      Console.log('Using fallback physics', 'warn', 'Physics.js');
-    }
-
-    // Add rigidbodies to all mesh entities
-    SceneData.entities.forEach(entity => {
-      if (entity.type === 'mesh' && entity.name !== 'Floor') {
-        Physics.addBody(entity, 'dynamic');
-        entity._physics = { type:'dynamic', vy:0 };
-      }
-      if (entity.name === 'Floor') {
-        Physics.addBody(entity, 'fixed');
-      }
-    });
-
-    // Set up particle scene
-    window.ParticleSystem?.setScene(SceneView.scene);
-
-    // Build scene API
-    const logFn = (msg, type, src) => Console.log(msg, type || 'log', src || 'Script');
-    const sceneAPI = makeSceneAPI(
-      SceneData.entities,
-      { scene: SceneView.scene, THREE },
-      logFn
-    );
-
-    // Load scripts from FileTree
-    const files = SceneSave.getFileList().filter(f => f.type === 'script');
-    files.forEach(f => {
-      // Attach scripts to entities by matching name
-      SceneData.entities.forEach(entity => {
-        if (!entity.components) entity.components = [];
-        // Auto-attach if script name matches entity name
-        const scriptName = f.name.replace(/\.(js|ts|cscript)$/, '');
-        if (entity.name.toLowerCase().includes(scriptName.toLowerCase()) ||
-            scriptName.toLowerCase().includes(entity.name.toLowerCase())) {
-          const existing = entity.components.find(c => c.name === f.name);
-          if (!existing) {
-            entity.components.push({ type:'script', name:f.name, code:f.content });
-          }
-        }
-      });
-    });
-
-    // Init script runtime
-    Input.init();
-    ScriptRuntime.init(SceneData.entities, sceneAPI);
-
-    playing = true;
-    SceneView.playing = true;
-    AudioSystem.success();
-    Console.log('Play mode started — physics + scripts active', 'log', 'Engine.js');
-    toast('Playing', 'success');
-
-    // FPS counter
-    fpsInterval = setInterval(() => {
-      document.getElementById('fps-counter').textContent = frameCount + ' FPS';
-      frameCount = 0;
-    }, 1000);
-
-    // Game loop
-    GameLoop.start(dt => {
-      if (!playing) return;
-      frameCount++;
-
-      Input.tick();
-
-      // Physics step
-      if (physicsOK) {
-        Physics.step(dt);
-        Physics.syncToMeshes(SceneData.entities);
-      } else {
-        Physics.stepFallback(SceneData.entities, dt);
-      }
-
-      // Script update
-      ScriptRuntime.update(dt);
-
-      // Particle update
-      window.ParticleSystem?.update(dt);
-
-      // Animation update
-      AnimationSystem._applyFrame(AnimationSystem.currentFrame);
-      if (AnimationSystem.playing) {
-        AnimationSystem.currentFrame = Math.min(
-          AnimationSystem.totalFrames,
-          AnimationSystem.currentFrame + dt * AnimationSystem.fps
-        );
-      }
-
-      // Update inspector if something selected
-      const sel = SceneData.getById(SceneData.selected);
-      if (sel) Inspector.update(sel);
-    });
-  }
-
-  function stopPlayMode() {
-    const { Physics, ScriptRuntime, GameLoop } = window.CEngineRuntime;
-
-    playing = false;
-    SceneView.playing = false;
-    GameLoop.stop();
-    ScriptRuntime.stop();
-    window.ParticleSystem?.stopAll();
-
-    // Clean up physics bodies
-    SceneData.entities.forEach(e => Physics.removeBody(e.id));
-
-    document.getElementById('btn-play').disabled  = false;
-    document.getElementById('btn-pause').disabled = true;
-    document.getElementById('btn-stop').disabled  = true;
-    document.getElementById('btn-play').classList.remove('playing');
-    document.getElementById('fps-counter').textContent = '-- FPS';
-    clearInterval(fpsInterval);
-
-    AudioSystem.tone(220, 0.15, 0.05);
-    Console.log('Play mode stopped', 'log', 'Engine.js');
-    toast('Stopped');
-  }
-
-  /* ══════════════════════════════════════
      INIT
   ══════════════════════════════════════ */
   AudioSystem.init();
   buildInsertToolbar();
   SceneView.init();
   Inspector.clear();
-  FileTree.init();
-  AnimationSystem.init();
 
-  // Build sound + particle panels
-  setTimeout(() => {
-    window.SoundEngine?.buildEditorPanel();
-    // Inject particle editor into blueprint tab for now
-    const bpWrap = document.getElementById('tab-blueprint');
-    if (bpWrap) {
-      const peWrap = document.createElement('div');
-      peWrap.id = 'particle-editor-wrap';
-      peWrap.style.cssText = 'flex:1;overflow:hidden;display:flex;';
-      bpWrap.appendChild(peWrap);
-      window.ParticleSystem?.buildEditorPanel();
-    }
-  }, 500);
-
-  // Wire play/stop to full runtime
-  document.getElementById('btn-play')?.addEventListener('click', startPlayMode);
-  document.getElementById('btn-stop')?.addEventListener('click', stopPlayMode);
-  document.getElementById('btn-pause')?.addEventListener('click', () => {
-    playing = !playing;
-    SceneView.playing = playing;
-    AudioSystem.warn();
-    toast(playing ? 'Resumed' : 'Paused');
-  });
-
-  // Sync _selMesh for inspector sliders
+  // Sync _selMesh for inline inspector sliders
   setInterval(() => {
     const e = SceneData.getById(SceneData.selected);
     window._selMesh = e?.mesh || null;
   }, 100);
 
-  setTimeout(() => Console.log('CEngine v0.4 ready', 'log', 'Engine.js'),    100);
-  setTimeout(() => Console.log('Three.js r128 renderer active', 'log', 'Renderer.js'), 200);
-  setTimeout(() => Console.log('Physics: Rapier.js — loading...', 'log', 'Physics.js'), 300);
-  setTimeout(() => Console.log('Tip: Place objects → hit Play → they fall with physics!', 'log', 'Editor.js'), 800);
-  setTimeout(() => toast('CEngine v0.4 — Physics + Sound + Particles', 'success', 4000), 600);
+  // Startup messages
+  setTimeout(() => Console.log('CEngine v0.3 ready', 'log', 'Engine.js'),    100);
+  setTimeout(() => Console.log('Renderer: Three.js r128', 'log', 'Renderer3D.js'), 200);
+  setTimeout(() => Console.log('Input system ready', 'log', 'Input.js'),      300);
+  setTimeout(() => Console.log('Tip: Left-drag selected object to move it. RMB+drag to orbit. G/R/S keys. F to focus.', 'log', 'Editor.js'), 800);
+  setTimeout(() => toast('CEngine v0.3 — Ready', 'success', 3000), 500);
+
+})();
