@@ -8,453 +8,502 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <title>CEngine Mobile</title>
   <link rel="stylesheet" href="editor/mobile.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════
-     AUDIO
-═══════════════════════════════════ -->
-<audio id="audio-ambient" loop preload="auto">
+<audio id="m-audio" loop preload="auto">
   <source src="https://cdn.pixabay.com/audio/2022/10/16/audio_aac5e2c2c7.mp3" type="audio/mpeg"/>
 </audio>
 
-<!-- ═══════════════════════════════════
-     TOP BAR
-═══════════════════════════════════ -->
+<!-- TOP BAR -->
 <div id="m-topbar">
   <div id="m-logo">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <polygon points="8,2 14,5.5 14,10.5 8,14 2,10.5 2,5.5" stroke="#00a4dc" stroke-width="1.5" fill="none"/>
-      <polygon points="8,5 11,7 11,10 8,12 5,10 5,7" fill="#00a4dc" opacity="0.2"/>
-      <text x="8" y="10.5" text-anchor="middle" fill="#00a4dc" font-size="5.5" font-weight="800" font-family="monospace">C</text>
-    </svg>
+    <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="7,1.5 12.5,4.5 12.5,9.5 7,12.5 1.5,9.5 1.5,4.5" stroke="#00a4dc" stroke-width="1.3" fill="none"/><text x="7" y="9.5" text-anchor="middle" fill="#00a4dc" font-size="5" font-weight="800" font-family="monospace">C</text></svg>
     <span class="m-logo-text">CEngine</span>
-    <span class="m-version">v0.3</span>
+    <span class="m-version">v0.4</span>
   </div>
-
-  <div id="m-scene-name">Untitled Scene</div>
-
-  <div id="m-topbar-right">
-    <button class="m-icon-btn" id="m-btn-undo" title="Undo">
-      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8a5 5 0 1 1 1.5 3.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M3 4v4h4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span id="m-scene-name">Untitled Scene</span>
+  <div id="m-topbar-btns">
+    <button class="m-tbtn" id="m-save-btn" title="Save">
+      <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="3" y="1" width="7" height="4" stroke="currentColor" stroke-width="1" fill="none"/><rect x="2" y="8" width="10" height="5" stroke="currentColor" stroke-width="1" fill="none"/></svg>
     </button>
-    <button class="m-icon-btn" id="m-btn-redo" title="Redo">
-      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 0-1.5 3.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M13 4v4H9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button class="m-play-tbtn" id="m-play-btn">
+      <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg>
     </button>
-    <button class="m-play-btn" id="m-btn-play" title="Play">
-      <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="3,1 13,7 3,13" fill="currentColor"/></svg>
+    <button class="m-stop-tbtn hidden" id="m-stop-btn">
+      <svg width="11" height="11" viewBox="0 0 11 11"><rect x="2" y="2" width="7" height="7" fill="currentColor"/></svg>
     </button>
-    <button class="m-play-btn hidden" id="m-btn-stop" title="Stop">
-      <svg width="14" height="14" viewBox="0 0 14 14"><rect x="2" y="2" width="10" height="10" fill="currentColor"/></svg>
-    </button>
-    <button class="m-icon-btn" id="m-btn-menu" title="Menu">
-      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <button class="m-tbtn" id="m-menu-btn">
+      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 4h10M2 7h10M2 10h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
     </button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     MAIN SCENE VIEW
-═══════════════════════════════════ -->
+<!-- TAB BAR (Roblox style) -->
+<div id="m-tabbar">
+  <button class="m-tab active" data-tab="home">
+    <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 7l6-5 6 5M2 7v6h4v-3h2v3h4V7" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Home
+  </button>
+  <button class="m-tab" data-tab="model">
+    <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1l6 3.5v5.5L7 13l-6-3.5V4.5z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+    Model
+  </button>
+  <button class="m-tab" data-tab="script">
+    <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 4L1 7l2 3M11 4l2 3-2 3M8 2l-2 10" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
+    Script
+  </button>
+  <button class="m-tab" data-tab="animate">
+    <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 10V4l3 3 3-4 3 4 3-2" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
+    Animate
+  </button>
+  <button class="m-tab" data-tab="test">
+    <svg width="14" height="14" viewBox="0 0 14 14"><polygon points="2,1.5 12,7 2,12.5" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+    Test
+  </button>
+</div>
+
+<!-- RIBBON TOOLBAR -->
+<div id="m-ribbon">
+  <!-- Home ribbon (default) -->
+  <div id="ribbon-home" class="ribbon-panel">
+    <button class="m-ribbon-btn" data-prim="cube">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 2l7 3.5v7L9 16l-7-3.5v-7z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Part
+    </button>
+    <button class="m-ribbon-btn" data-prim="sphere">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2" fill="none"/><ellipse cx="9" cy="9" rx="7" ry="2.5" stroke="currentColor" stroke-width="0.7" fill="none"/></svg>
+      Sphere
+    </button>
+    <button class="m-ribbon-btn" data-prim="cylinder">
+      <svg width="18" height="18" viewBox="0 0 18 18"><ellipse cx="9" cy="5" rx="5" ry="2" stroke="currentColor" stroke-width="1.2" fill="none"/><ellipse cx="9" cy="13" rx="5" ry="2" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="4" y1="5" x2="4" y2="13" stroke="currentColor" stroke-width="1.2"/><line x1="14" y1="5" x2="14" y2="13" stroke="currentColor" stroke-width="1.2"/></svg>
+      Cyl
+    </button>
+    <button class="m-ribbon-btn" data-prim="plane">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M2 13l7-4 7 4H2z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M2 13v2h14v-2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Plane
+    </button>
+    <button class="m-ribbon-btn" data-prim="cone">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 2l6 11H3L9 2z" stroke="currentColor" stroke-width="1.2" fill="none"/><ellipse cx="9" cy="13" rx="6" ry="1.8" stroke="currentColor" stroke-width="1" fill="none"/></svg>
+      Cone
+    </button>
+    <div class="m-ribbon-divider"></div>
+    <button class="m-ribbon-btn" data-light="point">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="8" r="3.5" stroke="#ccaa44" stroke-width="1.2" fill="none"/><path d="M9 1v2M9 13v2M1 8h2M15 8h2M3 3l1.5 1.5M13.5 12.5L15 14M3 13l1.5-1.5M13.5 3.5L15 2" stroke="#ccaa44" stroke-width="1.2"/></svg>
+      Light
+    </button>
+    <button class="m-ribbon-btn" data-special="empty">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/></svg>
+      Empty
+    </button>
+    <div class="m-ribbon-divider"></div>
+    <button class="m-ribbon-btn m-transform-btn active" data-transform="translate">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1v16M1 9h16M9 1l-3 4h6L9 1zM9 17l-3-4h6l-3 4zM1 9l4-3v6L1 9zM17 9l-4-3v6l4-3z" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>
+      Move
+    </button>
+    <button class="m-ribbon-btn m-transform-btn" data-transform="rotate">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M9 3 A6 6 0 0 1 15 9" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M13.5 7l1.5 2 2-1.5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Rotate
+    </button>
+    <button class="m-ribbon-btn m-transform-btn" data-transform="scale">
+      <svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" stroke="currentColor" stroke-width="1.2" fill="none"/><rect x="10" y="10" width="7" height="7" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 5h5M13 5v5" stroke="currentColor" stroke-width="1.2"/></svg>
+      Scale
+    </button>
+    <div class="m-ribbon-divider"></div>
+    <button class="m-ribbon-btn" id="m-del-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M3 5.5h12M6.5 5.5V4h5v1.5M5 5.5v10h8v-10M7.5 8v5M10.5 8v5" stroke="#c0392b" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
+      <span style="color:#c0392b">Delete</span>
+    </button>
+    <button class="m-ribbon-btn" id="m-dup-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="5" width="11" height="12" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6 5V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-2" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Dup
+    </button>
+    <button class="m-ribbon-btn" id="m-focus-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M1 5V1h4M13 1h4v4M17 13v4h-4M5 17H1v-4" stroke="currentColor" stroke-width="1.2"/></svg>
+      Focus
+    </button>
+    <button class="m-ribbon-btn" id="m-gyro-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.2" fill="none"/><ellipse cx="9" cy="9" rx="7" ry="2.5" stroke="currentColor" stroke-width="0.7" fill="none" opacity="0.5"/><circle cx="9" cy="9" r="1.8" fill="currentColor"/></svg>
+      Gyro
+    </button>
+  </div>
+
+  <!-- Model ribbon -->
+  <div id="ribbon-model" class="ribbon-panel hidden">
+    <button class="m-ribbon-btn" id="m-hier-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M1 4h16M1 8h12M1 12h8M1 16h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Outliner
+    </button>
+    <button class="m-ribbon-btn" id="m-insp-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M3 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Properties
+    </button>
+    <button class="m-ribbon-btn" id="m-assets-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M2 5h6l2 2.5H16v9H2z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Assets
+    </button>
+    <div class="m-ribbon-divider"></div>
+    <button class="m-ribbon-btn m-transform-btn active" data-transform="translate">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Move
+    </button>
+    <button class="m-ribbon-btn m-transform-btn" data-transform="rotate">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Rotate
+    </button>
+    <button class="m-ribbon-btn m-transform-btn" data-transform="scale">
+      <svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" stroke="currentColor" stroke-width="1.2" fill="none"/><rect x="10" y="10" width="7" height="7" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Scale
+    </button>
+  </div>
+
+  <!-- Script ribbon -->
+  <div id="ribbon-script" class="ribbon-panel hidden">
+    <button class="m-ribbon-btn" id="m-new-script-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      New Script
+    </button>
+    <button class="m-ribbon-btn" id="m-save-script-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="1" width="16" height="16" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><rect x="4" y="1" width="9" height="6" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="10" width="12" height="7" stroke="currentColor" stroke-width="1" fill="none"/></svg>
+      Save
+    </button>
+    <button class="m-ribbon-btn" id="m-run-script-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><polygon points="3,2 16,9 3,16" fill="currentColor"/></svg>
+      Run
+    </button>
+    <div class="m-ribbon-divider"></div>
+    <button class="m-ribbon-btn" id="m-console-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="2" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M4 8l4 3-4 4M9 14h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Output
+    </button>
+  </div>
+
+  <!-- Animate ribbon -->
+  <div id="ribbon-animate" class="ribbon-panel hidden">
+    <button class="m-ribbon-btn" id="m-anim-record-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="5" fill="#c0392b"/></svg>
+      Record
+    </button>
+    <button class="m-ribbon-btn" id="m-anim-play-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><polygon points="3,2 16,9 3,16" fill="currentColor"/></svg>
+      Play
+    </button>
+    <button class="m-ribbon-btn" id="m-anim-stop-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><rect x="3" y="3" width="12" height="12" fill="currentColor"/></svg>
+      Stop
+    </button>
+    <button class="m-ribbon-btn" id="m-anim-key-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Add Key
+    </button>
+    <div class="m-ribbon-divider"></div>
+    <span id="m-anim-frame-label" style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono)">Frame</span>
+    <input type="number" id="m-anim-frame" value="0" min="0" max="120" style="width:44px"/>
+  </div>
+
+  <!-- Test ribbon -->
+  <div id="ribbon-test" class="ribbon-panel hidden">
+    <button class="m-ribbon-btn" id="m-play-here-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><polygon points="3,2 16,9 3,16" fill="#27ae60"/></svg>
+      Play Here
+    </button>
+    <button class="m-ribbon-btn" id="m-build-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M3 15l5-11 7 7-12 4z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Build
+    </button>
+    <div class="m-ribbon-divider"></div>
+    <button class="m-ribbon-btn" id="m-desktop-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="3" width="16" height="10" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6 13v3M12 13v3M4 16h10" stroke="currentColor" stroke-width="1.2"/></svg>
+      Desktop
+    </button>
+  </div>
+</div>
+
+<!-- SCENE CANVAS -->
 <div id="m-scene-wrap">
   <canvas id="m-scene-canvas"></canvas>
-
-  <!-- Gizmo compass -->
-  <div id="m-gizmo">
-    <canvas id="m-gizmo-canvas" width="60" height="60"></canvas>
-  </div>
-
-  <!-- Transform mode indicator -->
-  <div id="m-transform-indicator">
-    <span id="m-transform-label">MOVE</span>
-  </div>
-
-  <!-- FPS counter (play mode) -->
+  <canvas id="m-gizmo-canvas" width="50" height="50"></canvas>
+  <div id="m-transform-label">MOVE</div>
   <div id="m-fps" class="hidden">0 FPS</div>
 
-  <!-- Selected entity info -->
   <div id="m-selection-bar" class="hidden">
-    <span id="m-selection-name">Cube</span>
-    <div id="m-selection-actions">
-      <button class="m-sel-btn" id="m-btn-focus-sel">
-        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M1 3.5V1h2.5M10.5 1H13v2.5M13 10.5V13h-2.5M3.5 13H1v-2.5" stroke="currentColor" stroke-width="1.3"/></svg>
-        Focus
-      </button>
-      <button class="m-sel-btn" id="m-btn-dup-sel">
-        <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="4" width="8" height="9" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 4V3a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-1" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
-        Copy
-      </button>
-      <button class="m-sel-btn danger" id="m-btn-del-sel">
-        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 4.5h9M5 4.5V3h4v1.5M4 4.5v7h6v-7M6 6.5v3M8 6.5v3" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>
-        Del
-      </button>
+    <span id="m-sel-name">—</span>
+    <div id="m-sel-actions">
+      <button class="m-sel-btn" id="m-sel-focus">Focus</button>
+      <button class="m-sel-btn" id="m-sel-dup">Copy</button>
+      <button class="m-sel-btn danger" id="m-sel-del">Del</button>
     </div>
   </div>
 
-  <!-- Controls hint -->
-  <div id="m-controls-hint">1-finger: orbit  •  2-finger: zoom  •  Drag selected: move</div>
+  <!-- Joystick (play mode) -->
+  <div id="m-joy-overlay" class="hidden">
+    <div id="m-joy-left" class="m-joy-zone m-joy-left">
+      <div id="m-joy-left-base" class="m-joy-base hidden">
+        <div id="m-joy-left-stick" class="m-joy-stick"></div>
+      </div>
+      <span class="m-joy-hint">Move</span>
+    </div>
+    <div id="m-joy-right" class="m-joy-zone m-joy-right">
+      <div id="m-joy-right-base" class="m-joy-base hidden">
+        <div id="m-joy-right-stick" class="m-joy-stick"></div>
+      </div>
+      <span class="m-joy-hint">Look</span>
+    </div>
+    <div id="m-action-btns">
+      <button class="m-action-btn m-btn-jump" id="m-btn-jump">
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 13V5M4 7l3-3 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        Jump
+      </button>
+      <button class="m-action-btn m-btn-shoot" id="m-btn-shoot">
+        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h8M12 5.5l-2 1.5 2 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>
+        Fire
+      </button>
+      <button class="m-action-btn m-btn-act" id="m-btn-act">
+        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="4" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M5 7l1.5 1.5 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        Act
+      </button>
+    </div>
+    <div id="m-hud">
+      <div id="m-hud-hp">
+        <span class="m-hud-lbl">HP</span>
+        <div class="m-hud-bar-wrap"><div class="m-hud-bar-fill" id="m-hp-bar" style="width:100%"></div></div>
+        <span class="m-hud-val" id="m-hp-val">100</span>
+      </div>
+      <span id="m-hud-score">Score: 0</span>
+      <div id="m-hud-ammo">
+        <span class="m-hud-lbl">AMM</span>
+        <span class="m-hud-val" id="m-ammo-val">30</span>
+      </div>
+    </div>
+    <div id="m-crosshair"><div class="m-ch-h"></div><div class="m-ch-v"></div></div>
+  </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     BOTTOM TOOLBAR
-═══════════════════════════════════ -->
-<div id="m-bottom-toolbar">
-
-  <!-- INSERT SECTION -->
-  <div class="m-tool-section" id="m-insert-section">
-    <div class="m-tool-label">Insert</div>
-    <div class="m-tool-row" id="m-primitives-row">
-      <button class="m-tool-btn" data-prim="cube">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2l8 4v8l-8 4-8-4V6z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M10 2v9M18 6l-8 3M2 6l8 3" stroke="currentColor" stroke-width="1" opacity="0.5"/></svg>
-        <span>Cube</span>
-      </button>
-      <button class="m-tool-btn" data-prim="sphere">
-        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.3" fill="none"/><ellipse cx="10" cy="10" rx="8" ry="3" stroke="currentColor" stroke-width="0.8" fill="none"/><ellipse cx="10" cy="10" rx="3" ry="8" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.5"/></svg>
-        <span>Sphere</span>
-      </button>
-      <button class="m-tool-btn" data-prim="cylinder">
-        <svg width="20" height="20" viewBox="0 0 20 20"><ellipse cx="10" cy="5.5" rx="6" ry="2.5" stroke="currentColor" stroke-width="1.3" fill="none"/><ellipse cx="10" cy="14.5" rx="6" ry="2.5" stroke="currentColor" stroke-width="1.3" fill="none"/><line x1="4" y1="5.5" x2="4" y2="14.5" stroke="currentColor" stroke-width="1.3"/><line x1="16" y1="5.5" x2="16" y2="14.5" stroke="currentColor" stroke-width="1.3"/></svg>
-        <span>Cyl</span>
-      </button>
-      <button class="m-tool-btn" data-prim="plane">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 14l8-5 8 5H2z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M2 14v2h16v-2" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
-        <span>Plane</span>
-      </button>
-      <button class="m-tool-btn" data-prim="cone">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2l7 12H3L10 2z" stroke="currentColor" stroke-width="1.3" fill="none"/><ellipse cx="10" cy="14" rx="7" ry="2" stroke="currentColor" stroke-width="1" fill="none"/></svg>
-        <span>Cone</span>
-      </button>
-      <button class="m-tool-btn" data-prim="torus">
-        <svg width="20" height="20" viewBox="0 0 20 20"><ellipse cx="10" cy="10" rx="7" ry="3.5" stroke="currentColor" stroke-width="1.3" fill="none"/><ellipse cx="10" cy="10" rx="3.5" ry="1.8" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.5"/></svg>
-        <span>Torus</span>
-      </button>
-      <button class="m-tool-btn" data-light="point">
-        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="9" r="4" stroke="#ccaa44" stroke-width="1.3" fill="none"/><path d="M10 1v2M10 16v2M1 9h2M17 9h2M3 3l1.5 1.5M15.5 14.5L17 16M3 15l1.5-1.5M15.5 3.5L17 2" stroke="#ccaa44" stroke-width="1.3"/></svg>
-        <span>Light</span>
-      </button>
-      <button class="m-tool-btn" data-special="empty">
-        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="1.3" fill="none" stroke-dasharray="3 2"/><path d="M10 6v8M6 10h8" stroke="currentColor" stroke-width="1" opacity="0.5"/></svg>
-        <span>Empty</span>
-      </button>
-    </div>
+<!-- CODE VIEW -->
+<div id="m-code-wrap" class="hidden">
+  <div id="m-code-files">
+    <div class="m-file-tab active" data-file="PlayerController.js">PlayerController.js</div>
+    <div class="m-file-tab" data-file="EnemyAI.js">EnemyAI.js</div>
+    <div class="m-file-tab" data-file="GameManager.js">GameManager.js</div>
+    <div class="m-file-tab" data-file="+ New">+ New</div>
   </div>
+  <div id="m-code-editor">
+    <textarea id="m-code-textarea" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">// PlayerController.js
 
-  <div class="m-toolbar-divider"></div>
+class PlayerController {
+  onStart() {
+    this.speed = 5;
+    this.jumpForce = 8;
+    CEngine.log('Player ready');
+  }
 
-  <!-- TRANSFORM SECTION -->
-  <div class="m-tool-section">
-    <div class="m-tool-label">Transform</div>
-    <div class="m-tool-row">
-      <button class="m-tool-btn m-transform-tool active" data-transform="translate">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M2 10h16M10 2l-3 4h6L10 2zM10 18l-3-4h6l-3 4zM2 10l4-3v6L2 10zM18 10l-4-3v6l4-3z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
-        <span>Move</span>
-      </button>
-      <button class="m-tool-btn m-transform-tool" data-transform="rotate">
-        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M10 3 A7 7 0 0 1 17 10" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M15 8l2 2 2-1.5" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
-        <span>Rotate</span>
-      </button>
-      <button class="m-tool-btn m-transform-tool" data-transform="scale">
-        <svg width="20" height="20" viewBox="0 0 20 20"><rect x="1" y="1" width="7" height="7" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="12" y="12" width="7" height="7" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 6h6M14 6v6" stroke="currentColor" stroke-width="1.3"/></svg>
-        <span>Scale</span>
-      </button>
-    </div>
+  onUpdate(dt) {
+    if (Input.held('ArrowRight')) this.transform.position.x += this.speed * dt;
+    if (Input.held('ArrowLeft'))  this.transform.position.x -= this.speed * dt;
+    if (Input.held('ArrowUp'))    this.transform.position.z -= this.speed * dt;
+    if (Input.held('ArrowDown'))  this.transform.position.z += this.speed * dt;
+    if (Input.pressed('Space'))   this.rb.addForce(0, this.jumpForce, 0);
+  }
+
+  onCollide(other) {
+    if (other.tag === 'Enemy') {
+      Sound.playEffect('hit');
+      Scene.load('GameOver');
+    }
+  }
+}</textarea>
   </div>
-
-  <div class="m-toolbar-divider"></div>
-
-  <!-- VIEW / PANELS SECTION -->
-  <div class="m-tool-section">
-    <div class="m-tool-label">Panels</div>
-    <div class="m-tool-row">
-      <button class="m-tool-btn" id="m-btn-hierarchy">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 4h16M2 8h12M2 12h8M2 16h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        <span>Outliner</span>
-      </button>
-      <button class="m-tool-btn" id="m-btn-inspector">
-        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M4 18c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
-        <span>Inspector</span>
-      </button>
-      <button class="m-tool-btn" id="m-btn-console-tab">
-        <svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 8l3 2.5L5 13M10 13h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        <span>Console</span>
-      </button>
-      <button class="m-tool-btn" id="m-btn-assets">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 5h7l2 2.5H18v10H2z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
-        <span>Assets</span>
-      </button>
-      <button class="m-tool-btn" id="m-btn-gyro-mobile">
-        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.3" fill="none"/><ellipse cx="10" cy="10" rx="8" ry="3" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.6"/><circle cx="10" cy="10" r="2" fill="currentColor"/></svg>
-        <span>Gyro</span>
-      </button>
-      <button class="m-tool-btn" id="m-btn-build-mobile">
-        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 16l5-11 6 6-11 5z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M13 4l3 3-2.5 2.5-3-3z" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="15.5" cy="4.5" r="1" fill="currentColor"/></svg>
-        <span>Build</span>
-      </button>
-    </div>
-  </div>
-
 </div>
 
-<!-- ═══════════════════════════════════
-     SLIDE-UP PANELS (drawer style)
-═══════════════════════════════════ -->
+<!-- ANIMATION VIEW -->
+<div id="m-anim-wrap" class="hidden">
+  <div id="m-anim-toolbar">
+    <button class="m-anim-btn" id="m-anim-rec">● Record</button>
+    <button class="m-anim-btn" id="m-anim-play">▶ Play</button>
+    <button class="m-anim-btn" id="m-anim-addkey">+ Key</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+      <span id="m-anim-frame-label" style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono)">Frame</span>
+      <input type="number" id="m-anim-frame" value="0" min="0" max="120" style="width:40px;background:var(--bg-input);border:1px solid var(--border);color:var(--text-primary);border-radius:var(--radius);padding:2px 4px;font-size:10px;font-family:var(--font-mono);text-align:center;outline:none"/>
+      <span style="font-size:10px;color:var(--text-dim);font-family:var(--font-mono)">/ 120</span>
+    </div>
+  </div>
+  <div id="m-anim-main">
+    <div id="m-anim-tracks">
+      <div id="m-anim-track-header">TRACKS</div>
+      <div id="m-anim-track-list">
+        <div class="m-anim-track">Select an entity</div>
+      </div>
+    </div>
+    <div id="m-anim-timeline">
+      <div id="m-anim-ruler"></div>
+      <div id="m-anim-keys">
+        <canvas id="m-anim-canvas"></canvas>
+        <div id="m-anim-playhead" style="left:0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWERS -->
 <div id="m-drawer-overlay" class="hidden"></div>
 
-<!-- HIERARCHY DRAWER -->
+<!-- HIERARCHY -->
 <div id="m-drawer-hierarchy" class="m-drawer hidden">
   <div class="m-drawer-handle"></div>
   <div class="m-drawer-header">
-    <span class="m-drawer-title">
-      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 3h12M1 7h9M1 11h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      World Outliner
-    </span>
-    <div class="m-drawer-header-actions">
-      <button class="m-drawer-add-btn" id="m-btn-add-entity-drawer">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </button>
-      <button class="m-drawer-close" data-drawer="hierarchy">
-        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </button>
+    <span class="m-drawer-title">World Outliner</span>
+    <div style="display:flex;gap:5px;align-items:center">
+      <button class="m-drawer-close" style="width:26px;height:26px;background:var(--bg-selected);border:1px solid var(--border-accent);color:var(--accent);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;cursor:pointer" id="m-add-entity-btn">+</button>
+      <button class="m-drawer-close" data-drawer="hierarchy">✕</button>
     </div>
   </div>
-  <div class="m-drawer-search-row">
-    <input type="text" class="m-drawer-search" id="m-hierarchy-search" placeholder="Search entities..."/>
-  </div>
-  <div id="m-hierarchy-list" class="m-drawer-body"></div>
+  <input type="text" class="m-search" id="m-hier-search" placeholder="Search entities..."/>
+  <div id="m-hier-list" class="m-drawer-body"></div>
 </div>
 
-<!-- INSPECTOR DRAWER -->
+<!-- INSPECTOR -->
 <div id="m-drawer-inspector" class="m-drawer hidden">
   <div class="m-drawer-handle"></div>
   <div class="m-drawer-header">
-    <span class="m-drawer-title">
-      <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="5" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M2 13c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
-      Details
-    </span>
-    <button class="m-drawer-close" data-drawer="inspector">
-      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
+    <span class="m-drawer-title">Properties</span>
+    <button class="m-drawer-close" data-drawer="inspector">✕</button>
   </div>
-  <div id="m-inspector-body" class="m-drawer-body"></div>
+  <div id="m-insp-body" class="m-drawer-body"></div>
 </div>
 
-<!-- CONSOLE DRAWER -->
+<!-- CONSOLE -->
 <div id="m-drawer-console" class="m-drawer hidden">
   <div class="m-drawer-handle"></div>
   <div class="m-drawer-header">
-    <span class="m-drawer-title">
-      <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M3.5 5l2.5 2-2.5 2M7 9h3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      Console
-    </span>
-    <div class="m-drawer-header-actions">
-      <button class="m-console-clear-btn" id="m-btn-clear-console">
-        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        Clear
-      </button>
-      <button class="m-drawer-close" data-drawer="console">
-        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      </button>
+    <span class="m-drawer-title">Output</span>
+    <div style="display:flex;gap:5px;align-items:center">
+      <button id="m-clear-console" style="background:transparent;border:1px solid var(--border);color:var(--text-secondary);padding:3px 8px;border-radius:var(--radius);font-size:10px;font-family:inherit;cursor:pointer">Clear</button>
+      <button class="m-drawer-close" data-drawer="console">✕</button>
     </div>
   </div>
-  <div id="m-console-output" class="m-drawer-body m-console-output"></div>
+  <div id="m-console-out" class="m-drawer-body m-console-body"></div>
   <div id="m-console-input-row">
     <span class="m-console-prompt">&gt;</span>
-    <input type="text" id="m-console-input" placeholder="Enter command..." autocomplete="off" spellcheck="false"/>
-    <button id="m-btn-console-run">
-      <svg width="12" height="12" viewBox="0 0 12 12"><polygon points="2,1 11,6 2,11" fill="currentColor"/></svg>
-    </button>
+    <input type="text" id="m-console-in" placeholder="Enter command..." autocomplete="off" spellcheck="false"/>
+    <button id="m-console-run">▶</button>
   </div>
 </div>
 
-<!-- ASSETS DRAWER -->
+<!-- ASSETS -->
 <div id="m-drawer-assets" class="m-drawer hidden">
   <div class="m-drawer-handle"></div>
   <div class="m-drawer-header">
-    <span class="m-drawer-title">
-      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 4h5l2 2h5v7H1z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
-      Content Browser
-    </span>
-    <button class="m-drawer-close" data-drawer="assets">
-      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
+    <span class="m-drawer-title">Content Browser</span>
+    <button class="m-drawer-close" data-drawer="assets">✕</button>
   </div>
-  <div class="m-drawer-body">
-    <div class="m-asset-folders">
-      <div class="m-asset-folder active" data-folder="scenes">
-        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M1 4l6-3 6 3v6l-6 3-6-3z" stroke="#00a4dc" stroke-width="1.2" fill="none"/></svg>
-        Scenes
-      </div>
-      <div class="m-asset-folder" data-folder="scripts">
-        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 4L1 7l2 3M11 4l2 3-2 3M7 2l-2 10" stroke="#44cc88" stroke-width="1.2" fill="none"/></svg>
-        Scripts
-      </div>
-      <div class="m-asset-folder" data-folder="materials">
-        <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5" stroke="#cc8844" stroke-width="1.2" fill="none"/></svg>
-        Materials
-      </div>
-      <div class="m-asset-folder" data-folder="models">
-        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1l6 3.5v5.5L7 13l-6-3V4.5z" stroke="#8888cc" stroke-width="1.2" fill="none"/></svg>
-        Models
-      </div>
-      <div class="m-asset-folder" data-folder="audio">
-        <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 5h3l3-2v8l-3-2H2V5z" stroke="#cccc44" stroke-width="1.2" fill="none"/></svg>
-        Audio
-      </div>
-      <div class="m-asset-folder" data-folder="textures">
-        <svg width="14" height="14" viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" stroke="#cc44cc" stroke-width="1.2" fill="none"/><circle cx="4.5" cy="4.5" r="1.5" stroke="#cc44cc" stroke-width="1" fill="none"/></svg>
-        Textures
-      </div>
+  <div class="m-asset-folders">
+    <div class="m-asset-folder active" data-folder="all">All</div>
+    <div class="m-asset-folder" data-folder="scripts">Scripts</div>
+    <div class="m-asset-folder" data-folder="models">Models</div>
+    <div class="m-asset-folder" data-folder="audio">Audio</div>
+    <div class="m-asset-folder" data-folder="textures">Textures</div>
+    <div class="m-asset-folder" data-folder="scenes">Scenes</div>
+  </div>
+  <div class="m-asset-grid m-drawer-body" id="m-asset-grid">
+    <div class="m-asset-item" data-type="script" data-name="PlayerController.js">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 6L2 12l3 4M19 6l3 6-3 4M10 3l-4 18" stroke="#44cc88" stroke-width="1.3" fill="none"/></svg>
+      PlayerController.js
     </div>
-    <div class="m-asset-grid" id="m-asset-grid">
-      <div class="m-asset-item">
-        <svg width="28" height="28" viewBox="0 0 28 28"><path d="M14 3l11 6v11l-11 6L3 20V9z" stroke="#00a4dc" stroke-width="1.3" fill="none"/></svg>
-        <span>SampleScene</span>
-      </div>
-      <div class="m-asset-item">
-        <svg width="28" height="28" viewBox="0 0 28 28"><path d="M5 6L2 14l3 3M23 6l3 8-3 3M14 3l-4 22" stroke="#44cc88" stroke-width="1.3" fill="none"/></svg>
-        <span>player.js</span>
-      </div>
-      <div class="m-asset-item">
-        <svg width="28" height="28" viewBox="0 0 28 28"><path d="M5 6L2 14l3 3M23 6l3 8-3 3M14 3l-4 22" stroke="#ffaa44" stroke-width="1.3" fill="none"/></svg>
-        <span>enemy.cs</span>
-      </div>
-      <div class="m-asset-item">
-        <svg width="28" height="28" viewBox="0 0 28 28"><rect x="3" y="3" width="22" height="22" rx="2" stroke="#cc44cc" stroke-width="1.3" fill="none"/><circle cx="9" cy="9" r="3" stroke="#cc44cc" stroke-width="1" fill="none"/></svg>
-        <span>ground.png</span>
-      </div>
-      <div class="m-asset-item">
-        <svg width="28" height="28" viewBox="0 0 28 28"><path d="M14 4l11 7v9l-11 6L3 20V11z" stroke="#8888cc" stroke-width="1.3" fill="none"/></svg>
-        <span>player.gltf</span>
-      </div>
-      <div class="m-asset-item">
-        <svg width="28" height="28" viewBox="0 0 28 28"><path d="M4 10h5l4-3v14l-4-3H4V10z" stroke="#cccc44" stroke-width="1.3" fill="none"/><path d="M15 9a5 5 0 0 1 0 10" stroke="#cccc44" stroke-width="1.3" fill="none"/></svg>
-        <span>jump.wav</span>
-      </div>
+    <div class="m-asset-item" data-type="script" data-name="EnemyAI.js">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 6L2 12l3 4M19 6l3 6-3 4M10 3l-4 18" stroke="#ffaa44" stroke-width="1.3" fill="none"/></svg>
+      EnemyAI.js
+    </div>
+    <div class="m-asset-item" data-type="script" data-name="GameManager.js">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 6L2 12l3 4M19 6l3 6-3 4M10 3l-4 18" stroke="#4488ff" stroke-width="1.3" fill="none"/></svg>
+      GameManager.js
+    </div>
+    <div class="m-asset-item" data-type="scene" data-name="SampleScene">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2l10 5.5v9.5L12 22l-10-5V7.5z" stroke="#00a4dc" stroke-width="1.3" fill="none"/></svg>
+      SampleScene
     </div>
   </div>
 </div>
 
-<!-- OVERFLOW MENU DRAWER -->
-<div id="m-drawer-menu" class="m-drawer m-drawer-menu hidden">
+<!-- MENU -->
+<div id="m-drawer-menu" class="m-drawer hidden">
   <div class="m-drawer-handle"></div>
   <div class="m-drawer-header">
     <span class="m-drawer-title">Menu</span>
-    <button class="m-drawer-close" data-drawer="menu">
-      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
+    <button class="m-drawer-close" data-drawer="menu">✕</button>
   </div>
-  <div class="m-menu-list">
-    <div class="m-menu-section-title">File</div>
-    <button class="m-menu-item" data-action="new-scene">
-      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.1"/></svg>
+  <div class="m-drawer-body">
+    <div class="m-menu-section">File</div>
+    <button class="m-menu-btn" data-action="new-scene">
+      <svg width="15" height="15" viewBox="0 0 15 15"><rect x="2" y="2" width="11" height="11" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
       New Scene
     </button>
-    <button class="m-menu-item" data-action="save-scene">
-      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="4" y="2" width="7" height="5" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="9" width="10" height="5" stroke="currentColor" stroke-width="1" fill="none"/></svg>
+    <button class="m-menu-btn" data-action="save-scene">
+      <svg width="15" height="15" viewBox="0 0 15 15"><rect x="1" y="1" width="13" height="13" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><rect x="3" y="1" width="8" height="5" stroke="currentColor" stroke-width="1" fill="none"/><rect x="2" y="8" width="11" height="6" stroke="currentColor" stroke-width="1" fill="none"/></svg>
       Save Scene
     </button>
-    <button class="m-menu-item" data-action="build-web">
-      <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 2c-2 2-2 8 0 12M8 2c2 2 2 8 0 12M2 8h12" stroke="currentColor" stroke-width="1"/></svg>
-      Build for Web
+    <button class="m-menu-btn" data-action="load-scene">
+      <svg width="15" height="15" viewBox="0 0 15 15"><path d="M1 4h5l2 2h7v8H1z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      Load Scene
     </button>
-    <button class="m-menu-item" data-action="build-android">
-      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="11" rx="2" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M6 3V2M10 3V2M7 11h2" stroke="currentColor" stroke-width="1.3"/></svg>
-      Build for Android
-    </button>
-
-    <div class="m-menu-section-title">View</div>
-    <button class="m-menu-item" data-action="toggle-grid">
-      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 2h12v12H2z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M6 2v12M10 2v12M2 6h12M2 10h12" stroke="currentColor" stroke-width="0.8" opacity="0.6"/></svg>
+    <div class="m-menu-section">View</div>
+    <button class="m-menu-btn" data-action="toggle-grid">
+      <svg width="15" height="15" viewBox="0 0 15 15"><path d="M1 1h13v13H1z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 1v13M10 1v13M1 5h13M1 10h13" stroke="currentColor" stroke-width="0.7" opacity="0.5"/></svg>
       Toggle Grid
     </button>
-    <button class="m-menu-item" data-action="toggle-wireframe">
-      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 2l6 4v5l-6 3-6-3V6z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 2v9M14 6l-6 3M2 6l6 3" stroke="currentColor" stroke-width="0.8" opacity="0.6"/></svg>
-      Wireframe
-    </button>
-    <button class="m-menu-item" data-action="switch-desktop">
-      <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="9" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 12v2M11 12v2M3 14h10" stroke="currentColor" stroke-width="1.3"/></svg>
+    <button class="m-menu-btn" data-action="switch-desktop">
+      <svg width="15" height="15" viewBox="0 0 15 15"><rect x="1" y="2" width="13" height="9" rx="1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 11v2M10 11v2M3 13h9" stroke="currentColor" stroke-width="1.2"/></svg>
       Switch to Desktop
     </button>
-
-    <div class="m-menu-section-title">Help</div>
-    <button class="m-menu-item" data-action="about">
-      <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 7v5M8 5v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      About CEngine
+    <div class="m-menu-section">Help</div>
+    <button class="m-menu-btn" data-action="about">
+      <svg width="15" height="15" viewBox="0 0 15 15"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M7.5 6.5v5M7.5 4.5v1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      About CEngine v0.4
     </button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     BUILD DRAWER
-═══════════════════════════════════ -->
+<!-- BUILD DRAWER -->
 <div id="m-drawer-build" class="m-drawer hidden">
   <div class="m-drawer-handle"></div>
   <div class="m-drawer-header">
-    <span class="m-drawer-title">
-      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 12l4-9 5 5-9 4z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
-      Build Settings
-    </span>
-    <button class="m-drawer-close" data-drawer="build">
-      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
+    <span class="m-drawer-title">Build</span>
+    <button class="m-drawer-close" data-drawer="build">✕</button>
   </div>
-  <div class="m-drawer-body m-build-body">
+  <div class="m-build-body m-drawer-body">
     <div class="m-build-platforms">
-      <div class="m-build-platform active" data-platform="web">
-        <svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" stroke="#00a4dc" stroke-width="1.5" fill="none"/><path d="M14 3c-4 4-4 18 0 22M14 3c4 4 4 18 0 22M3 14h22" stroke="#00a4dc" stroke-width="1.5"/></svg>
-        <span>Web</span>
-        <span class="m-platform-sub">HTML5</span>
+      <div class="m-build-plat active" data-platform="web">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#00a4dc" stroke-width="1.3" fill="none"/><path d="M12 3c-3 3-3 15 0 18M12 3c3 3 3 15 0 18M3 12h18" stroke="#00a4dc" stroke-width="1.3"/></svg>
+        <span>Web</span><span class="m-build-sub">HTML5</span>
       </div>
-      <div class="m-build-platform" data-platform="android">
-        <svg width="28" height="28" viewBox="0 0 28 28"><rect x="6" y="7" width="16" height="17" rx="3" stroke="#44cc88" stroke-width="1.5" fill="none"/><path d="M10 7V5M18 7V5M11 18h6" stroke="#44cc88" stroke-width="1.5"/></svg>
-        <span>Android</span>
-        <span class="m-platform-sub">TWA APK</span>
+      <div class="m-build-plat" data-platform="android">
+        <svg width="24" height="24" viewBox="0 0 24 24"><rect x="5" y="6" width="14" height="15" rx="2" stroke="#44cc88" stroke-width="1.3" fill="none"/><path d="M9 6V4M15 6V4M10 16h4" stroke="#44cc88" stroke-width="1.3"/></svg>
+        <span>Android</span><span class="m-build-sub">TWA</span>
       </div>
-      <div class="m-build-platform" data-platform="desktop">
-        <svg width="28" height="28" viewBox="0 0 28 28"><rect x="2" y="5" width="24" height="15" rx="2" stroke="#8888cc" stroke-width="1.5" fill="none"/><path d="M10 20v3M18 20v3M8 23h12" stroke="#8888cc" stroke-width="1.5"/></svg>
-        <span>Desktop</span>
-        <span class="m-platform-sub">Electron</span>
+      <div class="m-build-plat" data-platform="desktop">
+        <svg width="24" height="24" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="1" stroke="#8888cc" stroke-width="1.3" fill="none"/><path d="M8 17v3M16 17v3M6 20h12" stroke="#8888cc" stroke-width="1.3"/></svg>
+        <span>Desktop</span><span class="m-build-sub">Electron</span>
       </div>
     </div>
-
-    <div class="m-build-fields">
-      <div class="m-build-field">
-        <label>Game Name</label>
-        <input type="text" class="m-build-input" id="m-build-name" value="My CEngine Game"/>
-      </div>
-      <div class="m-build-field">
-        <label>Version</label>
-        <input type="text" class="m-build-input" id="m-build-ver" value="1.0.0"/>
-      </div>
-      <div class="m-build-options">
-        <label class="m-build-check"><input type="checkbox" checked/> Minify Scripts</label>
-        <label class="m-build-check"><input type="checkbox" checked/> Compress Assets</label>
-        <label class="m-build-check"><input type="checkbox"/> Dev Build</label>
-      </div>
+    <div class="m-build-field">
+      <label>Game Name</label>
+      <input type="text" class="m-build-inp" id="m-build-name" value="My CEngine Game"/>
     </div>
-
+    <div class="m-build-field">
+      <label>Version</label>
+      <input type="text" class="m-build-inp" id="m-build-ver" value="1.0.0"/>
+    </div>
     <div class="m-build-log" id="m-build-log">
-      <div class="m-build-log-line dim">Ready to build.</div>
+      <div class="m-build-line" style="color:var(--text-dim)">Ready to build.</div>
     </div>
-
-    <button class="m-build-go-btn" id="m-btn-start-build">
-      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 14l4-9 6 6-10 3z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
-      Build &amp; Launch
-    </button>
+    <button class="m-build-go" id="m-build-go">Build &amp; Launch</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     TOAST CONTAINER
-═══════════════════════════════════ -->
-<div id="m-toast-container"></div>
+<div id="m-toasts"></div>
 
-<!-- ═══════════════════════════════════
-     SCRIPTS
-═══════════════════════════════════ -->
+<!-- SCRIPTS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="editor/ui/MobileEditor.js"></script>
 </body>
-</html>
+      </html>
