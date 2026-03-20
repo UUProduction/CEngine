@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEngine</title>
+  <link rel="stylesheet" href="editor/editor.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+</head>
+<body>
+  <!-- MENUBAR -->
+  <div id="menubar">
+    <div id="engine-logo">
+      <span class="logo-c">C</span><span class="logo-engine">Engine</span>
+      <span class="version">v0.1</span>
+    </div>
+    <nav id="menu-nav">
+      <div class="menu-item" data-menu="file">File</div>
+      <div class="menu-item" data-menu="edit">Edit</div>
+      <div class="menu-item" data-menu="assets">Assets</div>
+      <div class="menu-item" data-menu="gameobject">GameObject</div>
+      <div class="menu-item" data-menu="component">Component</div>
+      <div class="menu-item" data-menu="window">Window</div>
+      <div class="menu-item" data-menu="help">Help</div>
+    </nav>
+    <div id="toolbar-center">
+      <button class="tool-btn" id="btn-translate" title="Translate (W)">✥</button>
+      <button class="tool-btn" id="btn-rotate" title="Rotate (E)">↻</button>
+      <button class="tool-btn" id="btn-scale" title="Scale (R)">⤢</button>
+      <div class="tool-divider"></div>
+      <button class="tool-btn" id="btn-local" title="Toggle Local/World">◈</button>
+    </div>
+    <div id="playbar">
+      <button class="play-btn" id="btn-play" title="Play">▶</button>
+      <button class="play-btn" id="btn-pause" title="Pause">⏸</button>
+      <button class="play-btn" id="btn-stop" title="Stop">⏹</button>
+    </div>
+    <div id="menu-right">
+      <span id="fps-counter">-- FPS</span>
+      <span id="scene-name">Untitled Scene</span>
+    </div>
+  </div>
+
+  <!-- DROPDOWN MENUS -->
+  <div id="dropdown-overlay" class="hidden"></div>
+  <div class="dropdown hidden" id="menu-file">
+    <div class="dd-item">New Scene <span class="dd-shortcut">Ctrl+N</span></div>
+    <div class="dd-item">Open Scene <span class="dd-shortcut">Ctrl+O</span></div>
+    <div class="dd-item">Save Scene <span class="dd-shortcut">Ctrl+S</span></div>
+    <div class="dd-separator"></div>
+    <div class="dd-item">Export Game</div>
+    <div class="dd-item">Build Settings</div>
+    <div class="dd-separator"></div>
+    <div class="dd-item">Exit</div>
+  </div>
+  <div class="dropdown hidden" id="menu-gameobject">
+    <div class="dd-item">Create Empty</div>
+    <div class="dd-item">3D Object ▸</div>
+    <div class="dd-item">2D Object ▸</div>
+    <div class="dd-item">Light ▸</div>
+    <div class="dd-item">Camera</div>
+    <div class="dd-item">Audio Source</div>
+  </div>
+
+  <!-- MAIN EDITOR LAYOUT -->
+  <div id="editor-layout">
+
+    <!-- LEFT: HIERARCHY -->
+    <div id="panel-hierarchy" class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Hierarchy</span>
+        <div class="panel-actions">
+          <button class="panel-btn" id="btn-add-entity" title="Add Entity">+</button>
+          <input class="panel-search" type="text" placeholder="Search..." id="hierarchy-search" />
+        </div>
+      </div>
+      <div class="panel-body" id="hierarchy-tree">
+        <div class="scene-root">
+          <div class="tree-item expanded" data-id="scene-root">
+            <span class="tree-arrow">▾</span>
+            <span class="tree-icon">🎬</span>
+            <span class="tree-label">Untitled Scene</span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-item selected" data-id="main-camera">
+              <span class="tree-arrow invisible">▾</span>
+              <span class="tree-icon">📷</span>
+              <span class="tree-label">Main Camera</span>
+            </div>
+            <div class="tree-item" data-id="dir-light">
+              <span class="tree-arrow invisible">▾</span>
+              <span class="tree-icon">💡</span>
+              <span class="tree-label">Directional Light</span>
+            </div>
+            <div class="tree-item" data-id="player">
+              <span class="tree-arrow">▾</span>
+              <span class="tree-icon">🎮</span>
+              <span class="tree-label">Player</span>
+            </div>
+            <div class="tree-children">
+              <div class="tree-item" data-id="player-mesh">
+                <span class="tree-arrow invisible">▾</span>
+                <span class="tree-icon">🔷</span>
+                <span class="tree-label">Mesh</span>
+              </div>
+              <div class="tree-item" data-id="player-collider">
+                <span class="tree-arrow invisible">▾</span>
+                <span class="tree-icon">🟩</span>
+                <span class="tree-label">Collider</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESIZE HANDLE -->
+    <div class="resize-handle vertical" id="resize-left"></div>
+
+    <!-- CENTER: SCENE VIEW + CODE EDITOR TABS -->
+    <div id="panel-center">
+      <div id="center-tabs">
+        <button class="center-tab active" data-tab="scene">Scene</button>
+        <button class="center-tab" data-tab="game">Game</button>
+        <button class="center-tab" data-tab="code">Code Editor</button>
+        <div class="tab-right">
+          <span class="render-mode-label">Shaded</span>
+          <select class="render-select" id="render-mode">
+            <option>Shaded</option>
+            <option>Wireframe</option>
+            <option>Unlit</option>
+          </select>
+          <label class="toggle-label">
+            <input type="checkbox" id="toggle-grid" checked /> Grid
+          </label>
+          <label class="toggle-label">
+            <input type="checkbox" id="toggle-gizmos" checked /> Gizmos
+          </label>
+        </div>
+      </div>
+
+      <!-- SCENE VIEW -->
+      <div id="tab-scene" class="tab-content active">
+        <canvas id="scene-canvas"></canvas>
+        <div id="scene-overlay">
+          <div id="scene-controls-hint">
+            RMB + Drag: Orbit &nbsp;|&nbsp; Scroll: Zoom &nbsp;|&nbsp; WASD: Pan
+          </div>
+          <div id="scene-gizmo">
+            <canvas id="gizmo-canvas" width="80" height="80"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME VIEW -->
+      <div id="tab-game" class="tab-content">
+        <canvas id="game-canvas"></canvas>
+        <div id="game-overlay">
+          <span id="game-status">Press ▶ to Play</span>
+        </div>
+      </div>
+
+      <!-- CODE EDITOR -->
+      <div id="tab-code" class="tab-content">
+        <div id="code-editor-bar">
+          <select id="code-lang-select">
+            <option value="javascript">JavaScript</option>
+            <option value="cscript">CScript</option>
+            <option value="python">Python</option>
+            <option value="lua">Lua</option>
+            <option value="glsl">GLSL (Shader)</option>
+            <option value="css">CSS+</option>
+          </select>
+          <span id="code-file-name">player.js</span>
+          <div class="code-actions">
+            <button class="code-btn" id="btn-save-script">💾 Save</button>
+            <button class="code-btn" id="btn-run-script">▶ Run</button>
+          </div>
+        </div>
+        <div id="monaco-container"></div>
+      </div>
+    </div>
+
+    <!-- RESIZE HANDLE -->
+    <div class="resize-handle vertical" id="resize-right"></div>
+
+    <!-- RIGHT: INSPECTOR -->
+    <div id="panel-inspector" class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Inspector</span>
+        <div class="panel-actions">
+          <button class="panel-btn" title="More">⋮</button>
+        </div>
+      </div>
+      <div class="panel-body" id="inspector-body">
+
+        <!-- Entity Header -->
+        <div class="inspector-entity-header">
+          <input type="checkbox" id="entity-active" checked />
+          <input type="text" class="entity-name-input" value="Main Camera" id="entity-name" />
+          <span class="entity-tag">MainCamera</span>
+        </div>
+
+        <!-- Transform Component -->
+        <div class="component-block">
+          <div class="component-header">
+            <span class="component-arrow">▾</span>
+            <span class="component-icon">⊕</span>
+            <span class="component-title">Transform</span>
+          </div>
+          <div class="component-body">
+            <div class="prop-row">
+              <span class="prop-label">Position</span>
+              <div class="vec3-inputs">
+                <label>X<input type="number" class="vec-input" value="0" step="0.1"/></label>
+                <label>Y<input type="number" class="vec-input" value="1" step="0.1"/></label>
+                <label>Z<input type="number" class="vec-input" value="-10" step="0.1"/></label>
+              </div>
+            </div>
+            <div class="prop-row">
+              <span class="prop-label">Rotation</span>
+              <div class="vec3-inputs">
+                <label>X<input type="number" class="vec-input" value="0" step="1"/></label>
+                <label>Y<input type="number" class="vec-input" value="0" step="1"/></label>
+                <label>Z<input type="number" class="vec-input" value="0" step="1"/></label>
+              </div>
+            </div>
+            <div class="prop-row">
+              <span class="prop-label">Scale</span>
+              <div class="vec3-inputs">
+                <label>X<input type="number" class="vec-input" value="1" step="0.1"/></label>
+                <label>Y<input type="number" class="vec-input" value="1" step="0.1"/></label>
+                <label>Z<input type="number" class="vec-input" value="1" step="0.1"/></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Component -->
+        <div class="component-block">
+          <div class="component-header">
+            <span class="component-arrow">▾</span>
+            <span class="component-icon">📷</span>
+            <span class="component-title">Camera</span>
+            <button class="component-remove" title="Remove Component">✕</button>
+          </div>
+          <div class="component-body">
+            <div class="prop-row">
+              <span class="prop-label">Projection</span>
+              <select class="prop-select"><option>Perspective</option><option>Orthographic</option></select>
+            </div>
+            <div class="prop-row">
+              <span class="prop-label">FOV</span>
+              <input type="range" min="10" max="170" value="60" class="prop-slider" />
+              <span class="prop-value">60°</span>
+            </div>
+            <div class="prop-row">
+              <span class="prop-label">Near Clip</span>
+              <input type="number" class="prop-input" value="0.1" step="0.01"/>
+            </div>
+            <div class="prop-row">
+              <span class="prop-label">Far Clip</span>
+              <input type="number" class="prop-input" value="1000"/>
+            </div>
+            <div class="prop-row">
+              <span class="prop-label">Clear Color</span>
+              <input type="color" class="prop-color" value="#1a1a2e" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Component Button -->
+        <div class="add-component-area">
+          <button class="add-component-btn" id="btn-add-component">+ Add Component</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM PANEL -->
+  <div class="resize-handle horizontal" id="resize-bottom"></div>
+  <div id="panel-bottom">
+    <div id="bottom-tabs">
+      <button class="bottom-tab active" data-tab="project">Project</button>
+      <button class="bottom-tab" data-tab="console">Console</button>
+      <button class="bottom-tab" data-tab="animation">Animation</button>
+      <button class="bottom-tab" data-tab="audio">Audio Mixer</button>
+    </div>
+
+    <!-- PROJECT PANEL -->
+    <div id="btab-project" class="btab-content active">
+      <div id="project-sidebar">
+        <div class="proj-folder active">📁 Assets</div>
+        <div class="proj-folder">📁 Scenes</div>
+        <div class="proj-folder">📁 Scripts</div>
+        <div class="proj-folder">📁 Materials</div>
+        <div class="proj-folder">📁 Models</div>
+        <div class="proj-folder">📁 Audio</div>
+        <div class="proj-folder">📁 Textures</div>
+        <div class="proj-folder">📁 Prefabs</div>
+      </div>
+      <div id="project-files">
+        <div class="file-item">🎬 SampleScene.json</div>
+        <div class="file-item">📄 player.js</div>
+        <div class="file-item">📄 enemy.cscript</div>
+        <div class="file-item">🎨 hud.css+</div>
+        <div class="file-item">🔷 player.gltf</div>
+        <div class="file-item">🔊 jump.wav</div>
+      </div>
+    </div>
+
+    <!-- CONSOLE PANEL -->
+    <div id="btab-console" class="btab-content">
+      <div id="console-toolbar">
+        <button class="console-btn active" id="filter-log">Log</button>
+        <button class="console-btn" id="filter-warn">⚠ Warn</button>
+        <button class="console-btn" id="filter-error">✕ Error</button>
+        <button class="console-btn" id="btn-clear-console">Clear</button>
+        <input class="console-search" type="text" placeholder="Filter..." />
+      </div>
+      <div id="console-output">
+        <div class="log-entry log">
+          <span class="log-time">0.000</span>
+          <span class="log-msg">CEngine v0.1 initialized</span>
+        </div>
+        <div class="log-entry log">
+          <span class="log-time">0.012</span>
+          <span class="log-msg">Scene loaded: Untitled Scene</span>
+        </div>
+        <div class="log-entry warn">
+          <span class="log-time">0.015</span>
+          <span class="log-msg">⚠ No scripts attached to Player</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANIMATION PANEL -->
+    <div id="btab-animation" class="btab-content">
+      <div class="placeholder-panel">Animation Timeline — Coming Soon</div>
+    </div>
+
+    <!-- AUDIO MIXER -->
+    <div id="btab-audio" class="btab-content">
+      <div class="placeholder-panel">Audio Mixer — Coming Soon</div>
+    </div>
+
+  </div>
+
+  <!-- CONTEXT MENU -->
+  <div id="context-menu" class="hidden">
+    <div class="ctx-item" data-action="rename">Rename</div>
+    <div class="ctx-item" data-action="duplicate">Duplicate</div>
+    <div class="ctx-item" data-action="delete">Delete</div>
+    <div class="ctx-separator"></div>
+    <div class="ctx-item" data-action="add-child">Add Child</div>
+    <div class="ctx-item" data-action="add-component">Add Component</div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+  <script src="engine/core/Engine.js"></script>
+  <script src="engine/core/Scene.js"></script>
+  <script src="engine/core/Entity.js"></script>
+  <script src="engine/core/Component.js"></script>
+  <script src="engine/renderer/Renderer3D.js"></script>
+  <script src="engine/ecs/ECS.js"></script>
+  <script src="editor/ui/Hierarchy.js"></script>
+  <script src="editor/ui/Inspector.js"></script>
+  <script src="editor/ui/SceneView.js"></script>
+  <script src="editor/ui/Console.js"></script>
+  <script src="editor/ui/Toolbar.js"></script>
+  <script src="editor/ui/ProjectPanel.js"></script>
+</body>
+</html>
